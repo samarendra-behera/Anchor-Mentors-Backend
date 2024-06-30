@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: anchor-backend
+    container_name: backend
+    ports:
+      - "5600:5000"
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - .:/usr/src/app
+  
+  db:
+    image: postgres
+    container_name: db
+    ports:
+      - "5436:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: anchor_db
+    restart: always 
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+
+volumes:
+  db_data:
