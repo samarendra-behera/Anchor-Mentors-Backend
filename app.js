@@ -5,6 +5,7 @@ const catchAsync = require('./utils/catchAsync')
 const AppError = require('./utils/appError')
 
 const authRouter = require('./route/authRoute')
+const globalErrorHandler = require('./controller/errorController')
 
 const app = express()
 
@@ -24,20 +25,10 @@ app.use('/api/v1/auth', authRouter)
 
 
 app.use('*', catchAsync(async(req, res, next )=> {
-    throw new AppError('This an error ', 400);
-    res.status(404).json({
-        status: 'fail',
-        message: 'Route not found'
-    });
+    throw new AppError(`Can't find ${req.originalUrl} on this server`, 404);
 }));
 
-app.use((err, req, res, next)=> {
-    res.status(err.statusCode).json({
-        status: err.status,
-        message: err.message,
-        stack: err.stack
-    });
-});
+app.use(globalErrorHandler);
 
 app.listen(process.env.APP_PORT, ()=> {
     console.log('Server up and running on port', process.env.APP_PORT);

@@ -5,7 +5,8 @@ const {
   DataTypes
 } = require('sequelize');
 const bcrypt = require('bcrypt')
-const sequelize = require('../../config/database')
+const sequelize = require('../../config/database');
+const AppError = require('../../utils/appError');
 
 module.exports = sequelize.define('user', {
   id: {
@@ -15,25 +16,67 @@ module.exports = sequelize.define('user', {
     type: DataTypes.INTEGER
   },
   userType: {
-    type: DataTypes.ENUM('admin', 'mentor', 'mentee')
+    type: DataTypes.ENUM('admin', 'mentor', 'mentee'),
+    allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'User type is required'
+      },
+      notEmpty: {
+        msg: 'User type cannot be empty'
+      }
+    }
   },
   fullName: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'Full name is required'
+      },
+      notEmpty: {
+        msg: 'Full name cannot be empty'
+      }
+    }
   },
   email: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'Email is required'
+      },
+      notEmpty: {
+        msg: 'Email cannot be empty'
+      },
+      isEmail: {
+        msg: 'Invalid email id'
+      }
+    }
   },
   password: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'Password is required'
+      },
+      notEmpty: {
+        msg: 'Password cannot be empty'
+      }
+    }
   },
   confirmPassword: {
     type: DataTypes.VIRTUAL,
     set(value) {
+      if(this.password.length < 7 ){
+        throw new AppError('Password must be at least 7 characters', 400)
+      }
       if (value === this.password){
         const hashPassword = bcrypt.hashSync(value, 10);
         this.setDataValue('password', hashPassword)
       }else {
-        throw new Error('Password and confirm password must be the same')
+        throw new AppError('Password and confirm password must be the same', 400)
       }
     }
   },
