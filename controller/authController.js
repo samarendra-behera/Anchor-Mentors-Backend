@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 
 const user = require("../db/models/user");
 const mentor = require("../db/models/mentor");
@@ -32,7 +33,7 @@ const signup = catchAsync(async (req, res, next) => {
     if (!newUser) {
         return next(new AppError('Failed to create the user', 400))
     }
-    
+
     if (newUser.userType === 'mentor') {
         await mentor.create({
             userId: newUser.id
@@ -69,13 +70,13 @@ const signup = catchAsync(async (req, res, next) => {
 
 const login = catchAsync(async (req, res, next) => {
     const { email, password } = req.body;
-    
+
     if (!email || !password) {
         return next(new AppError('Please provide email and password', 400))
     }
 
     const result = await user.findOne({ where: { email } })
-    
+
     if (!result || !(await bcrypt.compare(password, result.password))) {
         return next(new AppError('Incorrect email or password', 400))
     }
@@ -103,7 +104,7 @@ const authenticate = catchAsync(async (req, res, next) => {
 
     // 3. get the user details from db and add to req object
     const freshUser = await user.findByPk(tokenDetails.id)
-    if (!freshUser){
+    if (!freshUser) {
         return next(new AppError('User not longer exists', 401));
     }
     req.user = freshUser;
@@ -113,10 +114,10 @@ const authenticate = catchAsync(async (req, res, next) => {
 });
 
 const restrictTo = (...UserType) => {
-    const checkPermission = (req, res, next)=> {
-        if (!UserType.includes(req.user.userType)){
-            return next (new AppError(
-                'You do not have permission to perform this action', 
+    const checkPermission = (req, res, next) => {
+        if (!UserType.includes(req.user.userType)) {
+            return next(new AppError(
+                'You do not have permission to perform this action',
                 403
             ))
         }
@@ -126,7 +127,7 @@ const restrictTo = (...UserType) => {
     return checkPermission;
 }
 
-const changePassword = catchAsync(async (req, res, next)=> {
+const changePassword = catchAsync(async (req, res, next) => {
     console.log(req.user)
     const { password, confirmPassword } = req.body;
 
@@ -145,4 +146,77 @@ const changePassword = catchAsync(async (req, res, next)=> {
     })
 })
 
-module.exports = { signup, login, authenticate, restrictTo, changePassword};
+const forgotPassword = catchAsync(async (req, res, next) => {
+    const { email } = req.body;
+    if (!email) {
+        return next(new AppError('Please provide email', 400))
+    }
+    const forgotUser = await user.findOne({ where: { email } })
+    if (!forgotUser) {
+        return next(new AppError('User not found', 400))
+    }
+
+    const resetToken = crypto.randomBytes(30).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 40);
+
+    forgotUser.resetPasswordToken = resetToken;
+    forgotUser.resetPasswordExpires = Date.now() + 60 * 2 * 1000;
+    await forgotUser.save();
+
+    // reset password email send
+    const protocol = req.protocol;
+    const clientDomain = process.env.CLIENT_DOMAIN;
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: forgotUser.email,
+        subject: 'Password Reset Request',
+        text: `Hello ${forgotUser.fullName},\n\nYou are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
+            `Please click on the following link, or paste this into your browser to complete the process:\n\n` +
+            `${protocol}://${clientDomain}/reset/${resetToken}\n\n` +
+            `If you did not request this, please ignore this email and your password will remain unchanged.\n`
+    }
+
+    // Add the job to the queue
+    emailQueue.add({ mailOptions })
+
+    return res.status(200).json({
+        status: 'success',
+        message: 'Password reset email sent successfully'
+    })
+})
+
+const resetPassword = catchAsync(async (req, res, next) => {
+    const { password, confirmPassword } = req.body;
+    resetToken = req.params.token
+
+    if (!password || !confirmPassword) {
+        return next(new AppError('Please provide password and confirm password', 400))
+    }
+
+    const resetUser = await user.findOne({ where: { resetPasswordToken: resetToken } })
+
+    if (!resetUser) {
+        return next(new AppError('Invalid reset token', 400))
+    }
+
+    if (resetUser.resetPasswordExpires < Date.now()) {
+        return next(new AppError('Reset token expired', 400))
+    }
+
+    resetUser.password = password;
+    resetUser.confirmPassword = confirmPassword;
+    resetUser.resetPasswordToken = null;
+    resetUser.resetPasswordExpires = null;
+    await resetUser.save();
+
+    return res.status(200).json({
+        status: 'success',
+        message: 'Password reset successfully'
+    })
+
+})
+
+
+
+
+module.exports = { signup, login, authenticate, restrictTo, changePassword, forgotPassword, resetPassword };
