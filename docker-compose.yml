@@ -14,6 +14,7 @@ services:
       - /usr/src/app/node_modules # Avoids overwriting node_modules
     depends_on:
       - db
+      - inerp_redis
   
   db:
     image: postgres
