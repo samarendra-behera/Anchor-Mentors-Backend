@@ -47,6 +47,9 @@ const mentor = sequelize.define('mentor', {
   updatedAt: {
     allowNull: false,
     type: DataTypes.DATE
+  },
+  deletedAt: {
+    type: DataTypes.DATE
   }
 },
   {

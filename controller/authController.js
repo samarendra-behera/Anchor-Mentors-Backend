@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
 
 const user = require("../db/models/user");
+const mentor = require("../db/models/mentor");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
@@ -30,6 +31,12 @@ const signup = catchAsync(async (req, res, next) => {
     if (!newUser) {
         return next(new AppError('Failed to create the user', 400))
     }
+    
+    if (newUser.userType === 'mentor') {
+        await mentor.create({
+            userId: newUser.id
+        })
+    }
 
     const result = newUser.toJSON()
 
@@ -43,7 +50,7 @@ const signup = catchAsync(async (req, res, next) => {
     });
 
     // email send
-    
+
     return res.status(201).json({
         status: 'success',
         data: result
