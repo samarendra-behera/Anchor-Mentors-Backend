@@ -27,7 +27,8 @@ const signup = catchAsync(async (req, res, next) => {
         fullName: body.fullName,
         email: body.email,
         password: body.password,
-        confirmPassword: body.confirmPassword
+        confirmPassword: body.confirmPassword,
+        phoneNumber: body.phoneNumber
     })
 
     if (!newUser) {

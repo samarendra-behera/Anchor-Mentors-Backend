@@ -6,14 +6,18 @@ module.exports = {
     "database": process.env.DB_NAME,
     "host": process.env.DB_HOST,
     "port": process.env.DB_PORT,
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "timezone": process.env.APP_TIMEZONE,
+    "define": {
+      "timestamps": true,
+    },
   },
   "test": {
     "username": "root",
     "password": null,
     "database": "database_test",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
   },
   "production": {
     "username": process.env.DB_USERNAME,
@@ -21,6 +25,11 @@ module.exports = {
     "database": process.env.DB_NAME,
     "host": process.env.DB_HOST,
     "port": process.env.DB_PORT,
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "timezone": process.env.APP_TIMEZONE,
+    "define": {
+      "timestamps": true,
+      "underscored": true,
+    },
   }
 }

@@ -56,7 +56,21 @@ const user = sequelize.define('user', {
   },
   phoneNumber: {
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'Phone number is required'
+      },
+      notEmpty: {
+        msg: 'Phone number cannot be empty'
+      },
+      isValidPhoneNumber(value) {
+        // Define your custom validation logic here
+        if (!/^\+[1-9]{1}[0-9]{3,14}$/.test(value)) {
+          throw new AppError('Invalid phone number format', 400);
+        }
+      }
+    }
   },
   password: {
     type: DataTypes.STRING,
