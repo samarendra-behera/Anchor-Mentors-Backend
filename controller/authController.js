@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 
 const user = require("../db/models/user");
 const mentor = require("../db/models/mentor");
+const emailQueue = require("../thirdparty-services/emailQueue");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
@@ -50,6 +51,14 @@ const signup = catchAsync(async (req, res, next) => {
     });
 
     // email send
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: result.email,
+        subject: 'Welcome to Anchor Mentors',
+        text: `Hello ${result.fullName},\n\nThank you for signing up with Anchor Mentors.`
+    }
+    // Add the job to the queue
+    emailQueue.add({ mailOptions })
 
     return res.status(201).json({
         status: 'success',
