@@ -117,4 +117,23 @@ const restrictTo = (...UserType) => {
     return checkPermission;
 }
 
-module.exports = { signup, login, authenticate, restrictTo };
+const changePassword = catchAsync(async (req, res, next)=> {
+    console.log(req.user)
+    const { password, confirmPassword } = req.body;
+
+
+    if (!password || !confirmPassword) {
+        return next(new AppError('Please provide password and confirm password', 400))
+    }
+
+    req.user.password = password;
+    req.user.confirmPassword = confirmPassword;
+    await req.user.save();
+
+    return res.status(200).json({
+        status: 'success',
+        message: 'Password changed successfully'
+    })
+})
+
+module.exports = { signup, login, authenticate, restrictTo, changePassword};
