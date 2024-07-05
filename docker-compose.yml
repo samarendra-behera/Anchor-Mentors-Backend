@@ -27,6 +27,11 @@ services:
     restart: always 
     volumes:
       - db_data:/var/lib/postgresql/data
+  
+  anchor_redis:
+    restart: unless-stopped
+    container_name: anchor_redis
+    image: redis:alpine
 
 
 volumes:
