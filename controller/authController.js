@@ -35,11 +35,15 @@ const signup = catchAsync(async (req, res, next) => {
 
     delete result.password
     delete result.deletedAt
+    delete result.resetPasswordToken
+    delete result.resetPasswordExpires
 
     result.token = generateToken({
         id: result.id,
     });
 
+    // email send
+    
     return res.status(201).json({
         status: 'success',
         data: result
