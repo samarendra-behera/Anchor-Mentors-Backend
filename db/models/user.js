@@ -8,7 +8,7 @@ const bcrypt = require('bcrypt')
 const sequelize = require('../../config/database');
 const AppError = require('../../utils/appError');
 
-module.exports = sequelize.define('user', {
+const user = sequelize.define('user', {
   id: {
     allowNull: false,
     autoIncrement: true,
@@ -54,6 +54,10 @@ module.exports = sequelize.define('user', {
       }
     }
   },
+  phoneNumber: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   password: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -80,6 +84,14 @@ module.exports = sequelize.define('user', {
       }
     }
   },
+  resetPasswordToken: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  resetPasswordExpires: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
   createdAt: {
     allowNull: false,
     type: DataTypes.DATE
@@ -98,3 +110,5 @@ module.exports = sequelize.define('user', {
     modelName: 'user'
   }
 )
+
+module.exports = user
