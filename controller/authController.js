@@ -1,19 +1,49 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const { parsePhoneNumberFromString } = require('libphonenumber-js');
 
 const user = require("../db/models/user");
 const mentor = require("../db/models/mentor");
+const twilioClient = require("../config/twilioClient");
 const emailQueue = require("../thirdparty-services/emailQueue");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
+// Generate Token function
 const generateToken = (payload) => {
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRES_IN
     });
     return token;
 }
+
+
+
+const sendVerificationCode = catchAsync(async (req, res, next) => {
+    const { phoneNumber } = req.body;
+
+    // Validate and format phone number
+    const phoneNumberInstance = parsePhoneNumberFromString(phoneNumber, 'IN');
+    if (!phoneNumberInstance || !phoneNumberInstance.isValid()) {
+        return next(new AppError('Invalid phone number format', 400));
+    }
+
+    const formattedPhoneNumber = phoneNumberInstance.formatInternational();
+    console.log(formattedPhoneNumber);
+
+    // Send verification code
+    const verification = await twilioClient.verify.services(process.env.TWILIO_VERIFY_SERVICE_SID).verifications.create({
+        to: formattedPhoneNumber,
+        channel: 'sms'
+    })
+
+    res.status(200).json({
+        status: 'success',
+        message: `Verification code sent to ${formattedPhoneNumber}`,
+        data: verification
+    });
+})
 
 const signup = catchAsync(async (req, res, next) => {
     const body = req.body
@@ -222,4 +252,4 @@ const resetPassword = catchAsync(async (req, res, next) => {
 
 
 
-module.exports = { signup, login, authenticate, restrictTo, changePassword, forgotPassword, resetPassword };
+module.exports = {sendVerificationCode, signup, login, authenticate, restrictTo, changePassword, forgotPassword, resetPassword };

@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const fs = require('fs').promises;
 
 const mentor = require("../db/models/mentor");
 const user = require("../db/models/user");
@@ -53,16 +54,21 @@ const updateProfile = catchAsync(async (req, res, next) => {
 })
 
 const uploadProfilePic  = catchAsync(async (req, res, next) => {
-    const { id } = req.user
     const photo = req.file
     if(!photo){
         return next(new AppError('Please provide profile pic', 400));
     }
-    console.log(photo.path)
+
+    if (req.user.profilePicPath){
+        await fs.rm(req.user.profilePicPath, { force: true })
+    }
+
+    req.user.profilePicPath = photo.path
+    await req.user.save();
 
     return res.status(200).json({
         status: 'success',
-        message: 'Profile pic updated successfully' 
+        message: 'Profile pic uploaded successfully' 
     })
 });
 
