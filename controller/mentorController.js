@@ -52,8 +52,23 @@ const updateProfile = catchAsync(async (req, res, next) => {
     })
 })
 
+const uploadProfilePic  = catchAsync(async (req, res, next) => {
+    const { id } = req.user
+    const photo = req.file
+    if(!photo){
+        return next(new AppError('Please provide profile pic', 400));
+    }
+    console.log(photo.path)
+
+    return res.status(200).json({
+        status: 'success',
+        message: 'Profile pic updated successfully' 
+    })
+});
+
 
 module.exports = {
     myProfile,
-    updateProfile
+    updateProfile,
+    uploadProfilePic
 }

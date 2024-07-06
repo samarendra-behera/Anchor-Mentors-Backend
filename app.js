@@ -1,16 +1,21 @@
-require('dotenv').config({ path: `${process.cwd()}/.env` })
-const express = require('express')
+const path = require('path');
+const express = require('express');
+require('dotenv').config({ path: path.join(process.cwd(), '.env') });
 
-const catchAsync = require('./utils/catchAsync')
-const AppError = require('./utils/appError')
+const catchAsync = require('./utils/catchAsync');
+const AppError = require('./utils/appError');
 
-const globalErrorHandler = require('./controller/errorController')
-const authRouter = require('./route/authRoute')
-const mentorRouter = require('./route/mentorRoute')
+const globalErrorHandler = require('./controller/errorController');
+const authRouter = require('./route/authRoute');
+const mentorRouter = require('./route/mentorRoute');
 
 const app = express()
 
 app.use(express.json())
+
+// Serve the uploaded files statically
+console.log(path.join(process.cwd(), 'uploads'))
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 
 app.get('/', (req, res)=> {
