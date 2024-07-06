@@ -14,7 +14,6 @@ const app = express()
 app.use(express.json())
 
 // Serve the uploaded files statically
-console.log(path.join(process.cwd(), 'uploads'))
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 

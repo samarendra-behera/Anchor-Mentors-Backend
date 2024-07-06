@@ -12,7 +12,7 @@ const sendOtpQueue = new Queue('sendOtpQueue', {
 sendOtpQueue.process(async (job, done) => {
     const { msgData } = job.data;
     try {
-        await twilioClient.verify.services(process.env.TWILIO_VERIFY_SERVICE_SID).verifications.create(msgData)
+        await twilioClient.verify.v2.services(process.env.TWILIO_VERIFY_SERVICE_SID).verifications.create(msgData)
         done();
     } catch (error) {
         done(error)

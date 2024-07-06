@@ -10,6 +10,7 @@ const emailQueue = require("../thirdparty-services/emailQueue");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const sendOtpQueue = require("../thirdparty-services/sendOtpQueue");
+const phoneVerification = require("../db/models/phone_verification");
 
 // Generate Token function
 const generateToken = (payload) => {
@@ -18,8 +19,6 @@ const generateToken = (payload) => {
     });
     return token;
 }
-
-
 
 const sendVerificationCode = catchAsync(async (req, res, next) => {
     const { phoneNumber } = req.body;
@@ -33,17 +32,28 @@ const sendVerificationCode = catchAsync(async (req, res, next) => {
     const formattedPhoneNumber = phoneNumberInstance.formatInternational();
 
     // Send verification code
+    // await twilioClient.verify.services(process.env.TWILIO_VERIFY_SERVICE_SID).verifications.create({
+    //     to: formattedPhoneNumber,
+    //     channel: 'sms'
+    // })
     msgData = {
         to: formattedPhoneNumber,
         channel: 'sms'
     }
     sendOtpQueue.add({ msgData })
 
+    // save phone number in database
+    await phoneVerification.destroy({ where: { phoneNumber: formattedPhoneNumber, verified: false } })
+    await phoneVerification.create({
+        phoneNumber: formattedPhoneNumber
+    })
+
     res.status(200).json({
         status: 'success',
         message: `Verification code sent to ${formattedPhoneNumber}`
     });
 })
+
 
 const signup = catchAsync(async (req, res, next) => {
     const body = req.body
