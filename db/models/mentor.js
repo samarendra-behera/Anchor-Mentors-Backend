@@ -20,9 +20,6 @@ const mentor = sequelize.define('mentor', {
   role: {
     type: DataTypes.STRING
   },
-  profilePic: {
-    type: DataTypes.STRING
-  },
   location: {
     type: DataTypes.STRING
   },

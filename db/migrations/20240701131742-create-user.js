@@ -15,6 +15,9 @@ module.exports = {
       fullName: {
         type: Sequelize.STRING
       },
+      profilePicPath:{
+        type: Sequelize.STRING
+      },
       email: {
         type: Sequelize.STRING,
         unique: true

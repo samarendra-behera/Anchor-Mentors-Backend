@@ -39,6 +39,9 @@ const user = sequelize.define('user', {
       }
     }
   },
+  profilePicPath:{
+    type: Sequelize.STRING
+  },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
