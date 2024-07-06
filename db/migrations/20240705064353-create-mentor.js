@@ -26,7 +26,7 @@ module.exports = {
       location: {
         type: Sequelize.STRING
       },
-      laguages: {
+      languages: {
         type: Sequelize.STRING
       },
       inspires: {

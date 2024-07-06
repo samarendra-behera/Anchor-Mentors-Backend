@@ -104,7 +104,9 @@ const authenticate = catchAsync(async (req, res, next) => {
     const tokenDetails = jwt.verify(idToken, process.env.JWT_SECRET)
 
     // 3. get the user details from db and add to req object
-    const freshUser = await user.findByPk(tokenDetails.id)
+    const freshUser = await user.findByPk(tokenDetails.id, {
+        attributes: {exclude: ['password', 'resetPasswordToken', 'resetPasswordExpires']},
+    })
     if (!freshUser) {
         return next(new AppError('User not longer exists', 401));
     }
