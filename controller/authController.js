@@ -9,6 +9,7 @@ const twilioClient = require("../config/twilioClient");
 const emailQueue = require("../thirdparty-services/emailQueue");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const sendOtpQueue = require("../thirdparty-services/sendOtpQueue");
 
 // Generate Token function
 const generateToken = (payload) => {
@@ -30,18 +31,17 @@ const sendVerificationCode = catchAsync(async (req, res, next) => {
     }
 
     const formattedPhoneNumber = phoneNumberInstance.formatInternational();
-    console.log(formattedPhoneNumber);
 
     // Send verification code
-    const verification = await twilioClient.verify.services(process.env.TWILIO_VERIFY_SERVICE_SID).verifications.create({
+    msgData = {
         to: formattedPhoneNumber,
         channel: 'sms'
-    })
+    }
+    sendOtpQueue.add({ msgData })
 
     res.status(200).json({
         status: 'success',
-        message: `Verification code sent to ${formattedPhoneNumber}`,
-        data: verification
+        message: `Verification code sent to ${formattedPhoneNumber}`
     });
 })
 
