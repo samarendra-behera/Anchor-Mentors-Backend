@@ -32,15 +32,15 @@ const sendVerificationCode = catchAsync(async (req, res, next) => {
     const formattedPhoneNumber = phoneNumberInstance.formatInternational();
 
     // Send verification code
-    // await twilioClient.verify.services(process.env.TWILIO_VERIFY_SERVICE_SID).verifications.create({
-    //     to: formattedPhoneNumber,
-    //     channel: 'sms'
-    // })
-    msgData = {
+    await twilioClient.verify.services(process.env.TWILIO_VERIFY_SERVICE_SID).verifications.create({
         to: formattedPhoneNumber,
         channel: 'sms'
-    }
-    sendOtpQueue.add({ msgData })
+    })
+    // msgData = {
+    //     to: formattedPhoneNumber,
+    //     channel: 'sms'
+    // }
+    // sendOtpQueue.add({ msgData })
 
     // save phone number in database
     await phoneVerification.destroy({ where: { phoneNumber: formattedPhoneNumber, verified: false } })
@@ -54,6 +54,45 @@ const sendVerificationCode = catchAsync(async (req, res, next) => {
     });
 })
 
+
+const verifyVerificationCode = catchAsync(async (req, res, next) => {
+    const { phoneNumber, code } = req.body;
+
+    if (!phoneNumber || !code) {
+        return next(new AppError('Please provide phone number and code', 400))
+    }
+
+    // Validate and format phone number
+    const phoneNumberInstance = parsePhoneNumberFromString(phoneNumber, 'IN');
+    if (!phoneNumberInstance || !phoneNumberInstance.isValid()) {
+        return next(new AppError('Invalid phone number format', 400));
+    }
+    const formattedPhoneNumber = phoneNumberInstance.formatInternational();
+
+    // Verify verification code
+    const verification = await phoneVerification.findOne({ where: { phoneNumber: formattedPhoneNumber, verified: false } })
+    if (!verification) {
+        return next(new AppError('Invalid verification code', 400))
+    }
+
+    // twilio verify
+    const verificationCheck = await twilioClient.verify.v2.services(process.env.TWILIO_VERIFY_SERVICE_SID)
+        .verificationChecks
+        .create({ to: formattedPhoneNumber, code: code });
+    
+    if (verificationCheck.status !== 'approved') {
+        return next(new AppError('Invalid verification code', 400))
+    }
+
+    verification.verified = true
+    await verification.save()
+
+    res.status(200).json({
+        status: 'success',
+        message: 'Verification code verified successfully'
+    })
+
+});
 
 const signup = catchAsync(async (req, res, next) => {
     const body = req.body
@@ -145,7 +184,7 @@ const authenticate = catchAsync(async (req, res, next) => {
 
     // 3. get the user details from db and add to req object
     const freshUser = await user.findByPk(tokenDetails.id, {
-        attributes: {exclude: ['password', 'resetPasswordToken', 'resetPasswordExpires']},
+        attributes: { exclude: ['password', 'resetPasswordToken', 'resetPasswordExpires'] },
     })
     if (!freshUser) {
         return next(new AppError('User not longer exists', 401));
@@ -262,4 +301,4 @@ const resetPassword = catchAsync(async (req, res, next) => {
 
 
 
-module.exports = {sendVerificationCode, signup, login, authenticate, restrictTo, changePassword, forgotPassword, resetPassword };
+module.exports = { sendVerificationCode, verifyVerificationCode, signup, login, authenticate, restrictTo, changePassword, forgotPassword, resetPassword };

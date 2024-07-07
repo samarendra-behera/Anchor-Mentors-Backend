@@ -1,5 +1,6 @@
 const { 
     sendVerificationCode,
+    verifyVerificationCode,
     signup, 
     login, 
     authenticate, 
@@ -11,6 +12,7 @@ const {
 const router = require('express').Router();
 
 router.route('/send-code').post(sendVerificationCode);
+router.route('/verify-code').post(verifyVerificationCode);
 
 
 router.route('/signup').post(signup);
