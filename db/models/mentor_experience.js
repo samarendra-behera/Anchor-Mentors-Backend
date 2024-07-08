@@ -41,9 +41,9 @@ const mentorExperience = sequelize.define('mentor_experience', {
       }
       this.setDataValue('startDate', value);
     },
-    get() {
-      return this.getDataValue('startDate').toISOString().split('T')[0]
-    }
+    // get() {
+    //   return this.getDataValue('startDate').toISOString().split('T')[0]
+    // }
   },
   endDate: {
     type: DataTypes.DATEONLY,
@@ -57,10 +57,10 @@ const mentorExperience = sequelize.define('mentor_experience', {
       }
       this.setDataValue('endDate', value);
     },
-    get() {
-      if (! this.getDataValue('endDate')) return null
-      return this.getDataValue('startDate').toISOString().split('T')[0]
-    }
+    // get() {
+    //   if (! this.getDataValue('endDate')) return null
+    //   return this.getDataValue('endDate').toISOString().split('T')[0]
+    // }
   },
   details: {
     type: DataTypes.STRING({ length: 1000 })

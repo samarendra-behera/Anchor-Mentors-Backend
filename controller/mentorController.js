@@ -19,11 +19,63 @@ const myProfile = catchAsync(async (req, res, next) => {
                 model: user,
                 attributes: { exclude: ['password', 'deletedAt', 'resetPasswordToken', 'resetPasswordExpires', 'id'] },
             }
-        ]
+        ],
+        attributes: { exclude: ['deletedAt'] }
     });
+
+    profileData = currMentor.toJSON()
+    const mUser = profileData.user
+    delete profileData.user
+    profileData = { ...profileData, ...mUser }
+    delete mUser
+    delete currMentor
+
+    // get work experiences
+    const workExps = await mentorExperience.findAll({
+        where: {
+            mentorId: id,
+            experienceType: 'Work'
+        },
+        attributes: [
+            'startDate',
+            'endDate',
+            'details',
+            'isPresentEmployement',
+            [sequelize.col('placeName'), 'companyName'],
+            [sequelize.col('title'), 'jobTitle']
+        ]
+    })
+    const workExpsData = workExps.map(exp => exp.toJSON());
+
+
+    // get education experiences
+    const educationExps = await mentorExperience.findAll({
+        where: {
+            mentorId: id,
+            experienceType: 'Education'
+        },
+        attributes: [ 
+            'startDate', 
+            'endDate', 
+            'details',
+            [sequelize.col('placeName'), 'schoolName'],
+        ]
+    })
+    const educationExpsData = educationExps.map(exp => exp.toJSON());
+
+
+
+    profileData.workExperience = workExpsData;
+    profileData.educationExperience = educationExpsData;
+
+    // clean up
+    delete workExps, educationExps, workExpsData, educationExpsData
+
+
+
     return res.status(200).json({
         status: 'success',
-        profileDetails: currMentor,
+        profileDetails: profileData,
     });
 });
 
