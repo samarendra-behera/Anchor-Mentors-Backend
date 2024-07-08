@@ -3,7 +3,7 @@ const fs = require('fs').promises;
 
 const sequelize = require('../config/database');
 const mentor = require("../db/models/mentor");
-const { mentorExperience } = require("../db/models/mentor_experience");
+const mentorExperience = require("../db/models/mentor_experience");
 const user = require("../db/models/user");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require('../utils/appError');

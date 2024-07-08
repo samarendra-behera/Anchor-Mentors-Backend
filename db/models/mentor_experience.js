@@ -40,10 +40,7 @@ const mentorExperience = sequelize.define('mentor_experience', {
         throw new AppError('Start date must be a valid date', 400);
       }
       this.setDataValue('startDate', value);
-    },
-    // get() {
-    //   return this.getDataValue('startDate').toISOString().split('T')[0]
-    // }
+    }
   },
   endDate: {
     type: DataTypes.DATEONLY,
@@ -56,11 +53,7 @@ const mentorExperience = sequelize.define('mentor_experience', {
         }
       }
       this.setDataValue('endDate', value);
-    },
-    // get() {
-    //   if (! this.getDataValue('endDate')) return null
-    //   return this.getDataValue('endDate').toISOString().split('T')[0]
-    // }
+    }
   },
   details: {
     type: DataTypes.STRING({ length: 1000 })
@@ -98,4 +91,4 @@ const mentorExperience = sequelize.define('mentor_experience', {
   modelName: 'mentor_experience'
 });
 
-module.exports = { mentorExperience }
+module.exports = mentorExperience 
