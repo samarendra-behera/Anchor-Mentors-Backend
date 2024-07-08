@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/database');
+const AppError = require('../../utils/appError');
 
 const mentorExperience = sequelize.define('mentor_experience', {
   id: {
@@ -29,11 +30,37 @@ const mentorExperience = sequelize.define('mentor_experience', {
       notEmpty: {
         msg: 'Start date cannot be empty'
       }
+    },
+    set(value) {
+      if (!value) {
+        throw new AppError('Start date cannot be empty', 400);
+      }
+      value = new Date(value);
+      if (isNaN(value)) {
+        throw new AppError('Start date must be a valid date', 400);
+      }
+      this.setDataValue('startDate', value);
+    },
+    get() {
+      return this.getDataValue('startDate').toISOString().split('T')[0]
     }
   },
   endDate: {
     type: DataTypes.DATEONLY,
-    allowNull: true
+    allowNull: true,
+    set(value) {
+      if (value) {
+        value = new Date(value);
+        if (isNaN(value)) {
+          throw new AppError('End date must be a valid date', 400);
+        }
+      }
+      this.setDataValue('endDate', value);
+    },
+    get() {
+      if (! this.getDataValue('endDate')) return null
+      return this.getDataValue('startDate').toISOString().split('T')[0]
+    }
   },
   details: {
     type: DataTypes.STRING({ length: 1000 })
@@ -41,7 +68,13 @@ const mentorExperience = sequelize.define('mentor_experience', {
   isPresentEmployement: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
-    allowNull: false
+    allowNull: false,
+    set(value){
+      if (typeof value !== 'boolean') {
+        throw new AppError('isPresentEmployement must be true or false', 400);
+      }
+      this.setDataValue('isPresentEmployement', value);
+    }
   },
   mentorId: {
     type: DataTypes.INTEGER,
