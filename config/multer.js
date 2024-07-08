@@ -5,17 +5,19 @@ const { v4: uuidv4 } = require('uuid');
 
 const AppError = require('../utils/appError');
 
-// Create storage directory if it doesn't exist
-const storageDir = path.join(process.cwd(), 'uploads', 'profile-pics');
-if (!fs.existsSync(storageDir)) {
-    fs.mkdirSync(storageDir, { recursive: true });
+// Create mentorPicStorageDir directory if it doesn't exist
+const mentorPicStorageDir = path.join(process.cwd(), 'uploads', 'profile-pics');
+if (!fs.existsSync(mentorPicStorageDir)) {
+    fs.mkdirSync(mentorPicStorageDir, { recursive: true });
 }
+
+// Create mentorPitchDeckStorageDir directory if it doesn't exist
 
 
 // Configure Multer storage
-const storage = multer.diskStorage({
+const mentorPicStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, storageDir);
+        cb(null, mentorPicStorageDir);
     },
     filename: (req, file, cb) => {
         const userId = req.user.id; // Assuming user ID is available in the request
@@ -25,8 +27,8 @@ const storage = multer.diskStorage({
 });
 
 
-const upload = multer({
-    storage: storage,
+const mentorPicUpload = multer({
+    storage: mentorPicStorage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
     fileFilter: (req, file, cb) => {
         if (file.mimetype.startsWith('image/')) {
@@ -37,4 +39,4 @@ const upload = multer({
     },
 });
 
-module.exports = upload;
+module.exports = {mentorPicUpload};

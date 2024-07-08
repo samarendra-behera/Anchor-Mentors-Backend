@@ -50,7 +50,7 @@ module.exports = {
       menteePersonaForBooking: {
         type: Sequelize.STRING
       },
-      pitchDecPath: {
+      pitchDeckPath: {
         type: Sequelize.STRING
       },
       createdAt: {

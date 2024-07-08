@@ -68,7 +68,7 @@ const mentor = sequelize.define('mentor', {
   menteePersonaForBooking: {
     type: DataTypes.STRING
   },
-  pitchDecPath: {
+  pitchDeckPath: {
     type: DataTypes.STRING
   },
   createdAt: {
