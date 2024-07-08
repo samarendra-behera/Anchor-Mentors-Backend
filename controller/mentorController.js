@@ -4,6 +4,7 @@ const fs = require('fs').promises;
 const mentor = require("../db/models/mentor");
 const user = require("../db/models/user");
 const catchAsync = require("../utils/catchAsync");
+const AppError = require('../utils/appError');
 
 
 const myProfile = catchAsync(async (req, res, next) => {
@@ -84,8 +85,31 @@ const uploadProfilePic  = catchAsync(async (req, res, next) => {
 });
 
 
+const uploadPitchDeck  = catchAsync(async (req, res, next) => {
+    const doc = req.file
+    if(!doc){
+        return next(new AppError('Please provide pitch deck', 400));
+    }
+
+    const currMentor = await mentor.findByPk(req.user.id);
+    console.log("Mentor ",currMentor)
+    if (currMentor.pitchDeckPath){
+        await fs.rm(currMentor.pitchDeckPath, { force: true })
+    }
+
+    currMentor.pitchDeckPath = doc.path
+    await currMentor.save();
+
+    return res.status(200).json({
+        status: 'success',
+        message: 'Pitch deck uploaded successfully' 
+    })
+});
+
+
 module.exports = {
     myProfile,
     updateProfile,
-    uploadProfilePic
+    uploadProfilePic,
+    uploadPitchDeck
 }

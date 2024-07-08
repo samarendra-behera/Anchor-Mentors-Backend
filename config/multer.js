@@ -5,28 +5,41 @@ const { v4: uuidv4 } = require('uuid');
 
 const AppError = require('../utils/appError');
 
-// Create mentorPicStorageDir directory if it doesn't exist
-const mentorPicStorageDir = path.join(process.cwd(), 'uploads', 'profile-pics');
-if (!fs.existsSync(mentorPicStorageDir)) {
-    fs.mkdirSync(mentorPicStorageDir, { recursive: true });
-}
+const getSetStorageDir = (dir)=>{
+    storageDir = path.join(process.cwd(), 'uploads', dir);
+    if (!fs.existsSync(storageDir)) {
+        fs.mkdirSync(storageDir, { recursive: true });
+    }
 
-// Create mentorPitchDeckStorageDir directory if it doesn't exist
+    return storageDir;
+}
 
 
 // Configure Multer storage
 const mentorPicStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, mentorPicStorageDir);
+        cb(null, getSetStorageDir('profile-pics'));
     },
     filename: (req, file, cb) => {
-        const userId = req.user.id; // Assuming user ID is available in the request
-        const uniqueName = `${userId}-${uuidv4()}${path.extname(file.originalname)}`; // Generate unique filename with UUID and preserve file extension
+        const userId = req.user.id; 
+        const uniqueName = `${userId}-${uuidv4()}${path.extname(file.originalname)}`;
+        cb(null, uniqueName);
+    },
+});
+
+const mentorPitchDeckStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, getSetStorageDir('pitch-decks'));
+    },
+    filename: (req, file, cb) => {
+        const userId = req.user.id; 
+        const uniqueName = `${userId}-${uuidv4()}${path.extname(file.originalname)}`; 
         cb(null, uniqueName);
     },
 });
 
 
+// Configure Multer middleware
 const mentorPicUpload = multer({
     storage: mentorPicStorage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
@@ -39,4 +52,9 @@ const mentorPicUpload = multer({
     },
 });
 
-module.exports = {mentorPicUpload};
+const mentorPitchDeckUpload = multer({
+    storage: mentorPitchDeckStorage,
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit
+});
+
+module.exports = {mentorPicUpload, mentorPitchDeckUpload};
