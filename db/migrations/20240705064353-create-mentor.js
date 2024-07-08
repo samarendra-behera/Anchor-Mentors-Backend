@@ -38,6 +38,21 @@ module.exports = {
       linkedInUrl: {
         type: Sequelize.STRING
       },
+      educationExperienceDescription: {
+        type: Sequelize.STRING({length: 1000})
+      },
+      pastMentoringExperienceDescription: {
+        type: Sequelize.STRING({length: 1000})
+      },
+      domainExpertise: {
+        type: Sequelize.STRING
+      },
+      menteePersonaForBooking: {
+        type: Sequelize.STRING
+      },
+      pitchDecPath: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

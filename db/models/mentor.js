@@ -56,6 +56,21 @@ const mentor = sequelize.define('mentor', {
       }
     }
   },
+  educationExperienceDescription: {
+    type: DataTypes.STRING({length: 1000})
+  },
+  pastMentoringExperienceDescription: {
+    type: DataTypes.STRING({length: 1000})
+  },
+  domainExpertise: {
+    type: DataTypes.STRING
+  },
+  menteePersonaForBooking: {
+    type: DataTypes.STRING
+  },
+  pitchDecPath: {
+    type: DataTypes.STRING
+  },
   createdAt: {
     allowNull: false,
     type: DataTypes.DATE

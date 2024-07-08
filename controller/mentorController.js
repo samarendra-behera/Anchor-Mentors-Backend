@@ -37,11 +37,22 @@ const updateProfile = catchAsync(async (req, res, next) => {
         'languages',
         'inspires',
         'experience',
-        'linkedInUrl'
+        'linkedInUrl',
+        'educationExperienceDescription',
+        'pastMentoringExperienceDescription',
+        'domainExpertise',
+        'menteePersonaForBooking'
     ];
     // Pick only the fields present in the request body
     const updateFields = _.pick(req.body, updatableFields);
-    console.log(updateFields)
+    
+    if (updatableFields.includes('languages')) {
+        updateFields.languages = updateFields.languages.join(',');
+    }
+    if (updatableFields.includes('menteePersonaForBooking')){
+        updateFields.menteePersonaForBooking = updateFields.menteePersonaForBooking.join(',');
+    }
+
     await mentor.update(updateFields, {
         where: { userId: id }
     });
