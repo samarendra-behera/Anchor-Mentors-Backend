@@ -1,5 +1,6 @@
-const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/database');
+const AppError = require('../../utils/appError');
+const { DataTypes } = require('sequelize');
 
 
 const mentorAvailability = sequelize.define('mentor_availability', {
@@ -11,15 +12,37 @@ const mentorAvailability = sequelize.define('mentor_availability', {
   },
   startTime: {
     type: DataTypes.TIME,
-    allowNull: false
+    allowNull: false,
+    set(value) {
+      const regex = /^([01]\d|2[0-3]):([0-5]\d)(:([0-5]\d))?$/;
+      if (regex.test(value)) {
+        this.setDataValue('startTime', value);
+      } else {
+        throw new AppError(`Invalid start time ${value}`, 400);
+      }
+    }
   },
   endTime: {
     type: DataTypes.TIME,
     allowNull: false,
+    set(value) {
+      const regex = /^([01]\d|2[0-3]):([0-5]\d)(:([0-5]\d))?$/;
+      if (regex.test(value)) {
+        this.setDataValue('endTime', value);
+      } else {
+        throw new AppError(`Invalid end time ${value}`, 400);
+      }
+    }
   },
   dayName: {
     type: DataTypes.ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'),
-    allowNull: false
+    allowNull: false,
+    set(value) {
+      if (!['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].includes(value)) {
+        throw new AppError('Invalid day name', 400);
+      }
+      this.setDataValue('dayName', value);
+    }
   },
   mentorId: {
     type: DataTypes.INTEGER,

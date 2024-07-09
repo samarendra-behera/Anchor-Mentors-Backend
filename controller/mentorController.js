@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const fs = require('fs').promises;
+const {Op} = require('sequelize')
 
 const sequelize = require('../config/database');
 const mentor = require("../db/models/mentor");
@@ -266,22 +267,23 @@ const uploadEducationExperience = catchAsync(async (req, res, next) => {
 
 const uploadAvailability = catchAsync(async (req, res, next) => {
     const { id: mentorId } = req.user
-    const availability = req.body
-    if (!Array.isArray(availability) || !availability.length) {
-        return next(new AppError('Please provide your availability', 400));
+    const availabilities = req.body
+    if (!Array.isArray(availabilities) || !availabilities.length) {
+        return next(new AppError('Please provide your availabilities', 400));
     }
 
     let allAvailabilities = []
+    let entryDayNames = []
     const t = await sequelize.transaction();
-    
     try {
-        for(let day of availability) {
+        for(let day of availabilities) {
             let { startTime, endTime, dayName } = day
 
             if (!startTime || !endTime || !dayName) {
                 return next(new AppError('Please provide all required fields, [startTime, endTime, dayName]', 400));
             }
 
+            entryDayNames.push(dayName)
             allAvailabilities.push({
                 startTime,
                 endTime,
@@ -293,7 +295,8 @@ const uploadAvailability = catchAsync(async (req, res, next) => {
         // delete previous availabilities
         await mentorAvailability.destroy({
             where: {
-                mentorId
+                mentorId,
+                dayName: { [Op.in]: entryDayNames }
             },
             transaction: t
         })
