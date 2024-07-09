@@ -4,6 +4,7 @@ const fs = require('fs').promises;
 const sequelize = require('../config/database');
 const mentor = require("../db/models/mentor");
 const mentorExperience = require("../db/models/mentor_experience");
+const mentorAvailability = require("../db/models/mentor_availability");
 const user = require("../db/models/user");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require('../utils/appError');
@@ -263,11 +264,60 @@ const uploadEducationExperience = catchAsync(async (req, res, next) => {
     }
 });
 
+const uploadAvailability = catchAsync(async (req, res, next) => {
+    const { id: mentorId } = req.user
+    const availability = req.body
+    if (!Array.isArray(availability) || !availability.length) {
+        return next(new AppError('Please provide your availability', 400));
+    }
+
+    let allAvailabilities = []
+    const t = await sequelize.transaction();
+    
+    try {
+        for(let day of availability) {
+            let { startTime, endTime, dayName } = day
+
+            if (!startTime || !endTime || !dayName) {
+                return next(new AppError('Please provide all required fields, [startTime, endTime, dayName]', 400));
+            }
+
+            allAvailabilities.push({
+                startTime,
+                endTime,
+                dayName,
+                mentorId
+            })
+        }
+
+        // delete previous availabilities
+        await mentorAvailability.destroy({
+            where: {
+                mentorId
+            },
+            transaction: t
+        })
+
+        // create new availabilities
+        await mentorAvailability.bulkCreate(allAvailabilities, { transaction: t })
+        await t.commit();
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'Availability uploaded successfully'
+        })
+    } catch (err) {
+        await t.rollback();
+        next(err)
+    }
+});
+
 module.exports = {
     myProfile,
     updateProfile,
     uploadProfilePic,
     uploadPitchDeck,
     uploadWorkExperience,
-    uploadEducationExperience
+    uploadEducationExperience,
+    uploadAvailability
 }

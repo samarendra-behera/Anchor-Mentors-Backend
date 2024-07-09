@@ -2,37 +2,23 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('mentor_experience', {
+    await queryInterface.createTable('mentor_availability', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      title: {
-        type: Sequelize.STRING
-      },
-      experienceType: {
-        type: Sequelize.ENUM('Education', 'Work'),
+      startTime: {
+        type: Sequelize.TIME,
         allowNull: false
       },
-      placeName: {
-        type: Sequelize.STRING,
+      endTime: {
+        type: Sequelize.TIME,
         allowNull: false
       },
-      startDate: {
-        type: Sequelize.DATEONLY,
-        allowNull: false
-      },
-      endDate: {
-        type: Sequelize.DATEONLY
-      },
-      details: {
-        type: Sequelize.STRING({length: 1000})
-      },
-      isPresentEmployement: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
+      dayName: {
+        type: Sequelize.ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'),
         allowNull: false
       },
       mentorId: {
@@ -56,6 +42,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('mentor_experience');
+    await queryInterface.dropTable('mentor_availability');
   }
 };

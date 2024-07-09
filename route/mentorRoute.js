@@ -6,7 +6,8 @@ const {
     uploadProfilePic,
     uploadPitchDeck,
     uploadWorkExperience,
-    uploadEducationExperience
+    uploadEducationExperience,
+    uploadAvailability
 } = require('../controller/mentorController')
 
 const router = require('express').Router();
@@ -18,4 +19,5 @@ router.route('/profile-pic/upload').put(authenticate, restrictTo('mentor'), ment
 router.route('/pitch-deck/upload').put(authenticate, restrictTo('mentor'), mentorPitchDeckUpload.single('pitchDeck'), uploadPitchDeck);
 router.route('/work-experience/upload').put(authenticate, restrictTo('mentor'), uploadWorkExperience)
 router.route('/education-experience/upload').put(authenticate, restrictTo('mentor'), uploadEducationExperience)
+router.route('/availability/upload').put(authenticate, restrictTo('mentor'), uploadAvailability)
 module.exports = router;
