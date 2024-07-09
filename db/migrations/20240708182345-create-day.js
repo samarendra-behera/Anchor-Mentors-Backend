@@ -10,7 +10,8 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       dayName: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
       }
     });
   },
