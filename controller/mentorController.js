@@ -74,6 +74,19 @@ const myProfile = catchAsync(async (req, res, next) => {
     delete workExps, educationExps, workExpsData, educationExpsData
 
 
+    // get availability
+    const availabilities = await mentorAvailability.findAll({
+        where: {
+            mentorId: id
+        },
+        attributes: ['dayName', 'startTime', 'endTime'],
+    })
+    let availabilitiesData = []
+    for(let availability of availabilities) {
+        availabilitiesData.push()
+    }
+
+
 
     return res.status(200).json({
         status: 'success',
