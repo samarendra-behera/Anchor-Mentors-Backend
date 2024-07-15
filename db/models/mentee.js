@@ -34,19 +34,44 @@ const mentee = sequelize.define('mentee', {
     }
   },
   startupName: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
+    validate: {
+      notEmpty: {
+        msg: 'Startup Name cannot be empty'
+      }
+    }
   },
   currentStage: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
+    validate: {
+      notEmpty: {
+        msg: 'Current Stage cannot be empty'
+      }
+    }
   },
   fundingStage: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
+    validate: {
+      notEmpty: {
+        msg: 'Funding Stage cannot be empty'
+      }
+    }
   },
   aboutStartup: {
-    type: DataTypes.STRING({ length: 1000 })
+    type: DataTypes.STRING({ length: 1000 }),
+    validate: {
+      notEmpty: {
+        msg: 'About Startup cannot be empty'
+      }
+    }
   },
   painPointsOfStartup: {
-    type: DataTypes.STRING({ length: 2000 })
+    type: DataTypes.STRING({ length: 2000 }),
+    validate: {
+      notEmpty: {
+        msg: 'Pain Points of Startup cannot be empty'
+      }
+    }
   },
   websiteLink: {
     type: DataTypes.STRING,
@@ -65,7 +90,12 @@ const mentee = sequelize.define('mentee', {
     }
   },
   industry: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
+    validate: {
+      notEmpty: {
+        msg: 'Industry cannot be empty'
+      }
+    }
   },
   createdAt: {
     allowNull: false,

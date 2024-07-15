@@ -27,7 +27,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       inspires: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING({ length: 1000 })
       },
       experience: {
         type: Sequelize.FLOAT
@@ -48,7 +48,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       menteePersonaForBooking: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING({ length: 1000 })
       },
       pitchDeckPath: {
         type: Sequelize.STRING

@@ -34,7 +34,35 @@ const myProfile = catchAsync(async (req, res, next) => {
 });
 
 
+const updateProfile = catchAsync(async (req, res, next) => {
+    const { id:userId } = req.user
+
+    // Define the updatable fields
+    const updatableFields = [
+        'joinInspires',
+        'startupName',
+        'currentStage',
+        'fundingStage',
+        'aboutStartup',
+        'painPointsOfStartup',
+        'websiteLink',
+        'appLink',
+        'industry'
+    ];
+    // Pick only the fields present in the request body
+    const updateFields = _.pick(req.body, updatableFields);
+
+    await mentee.update(updateFields, {
+        where: { userId }
+    });
+
+    return res.status(200).json({
+        status: 'success',
+        message: 'Profile updated successfully'
+    })
+});
 
 module.exports = {
-    myProfile
+    myProfile,
+    updateProfile,
 }

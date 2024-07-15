@@ -43,7 +43,22 @@ const mentor = sequelize.define('mentor', {
     }
   },
   inspires: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING({ length: 1000 }),
+    set(value) {
+      if (!Array.isArray(value)) {
+        throw new AppError('Inspires must be an array', 400);
+      }
+      value = value.join(',');
+      if (!value) {
+        throw new AppError('Inspires cannot be empty', 400);
+      }
+      this.setDataValue('inspires', value);
+    },
+    get() {
+      let value = this.getDataValue('inspires');
+      if (!value)  return [];
+      return value.split(',');
+    }
   },
   experience: {
     type: DataTypes.FLOAT,
@@ -82,7 +97,7 @@ const mentor = sequelize.define('mentor', {
     type: DataTypes.STRING
   },
   menteePersonaForBooking: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING({ length: 1000 }),
     set(value) {
       if (!Array.isArray(value)) {
         throw new AppError('Mentee persona must be an array', 400);

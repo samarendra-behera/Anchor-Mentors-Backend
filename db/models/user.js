@@ -1,5 +1,5 @@
 'use strict';
-const {  DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const bcrypt = require('bcrypt')
 const sequelize = require('../../config/database');
 const AppError = require('../../utils/appError');
@@ -35,7 +35,7 @@ const user = sequelize.define('user', {
       }
     }
   },
-  profilePicPath:{
+  profilePicPath: {
     type: DataTypes.STRING
   },
   email: {
@@ -87,15 +87,15 @@ const user = sequelize.define('user', {
   confirmPassword: {
     type: DataTypes.VIRTUAL,
     set(value) {
-      if(this.password.length < 7 ){
-        throw new AppError('Password must be at least 7 characters', 400)
+      const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
+      if (!passwordRegex.test(this.password)) {
+        throw new AppError('Password must be at least 8 characters long and contain at least one uppercase letter, one number and one special character', 400)
       }
-      if (value === this.password){
-        const hashPassword = bcrypt.hashSync(value, 10);
-        this.setDataValue('password', hashPassword)
-      }else {
+      if (value !== this.password) {
         throw new AppError('Password and confirm password must be the same', 400)
       }
+      const hashPassword = bcrypt.hashSync(value, 10);
+      this.setDataValue('password', hashPassword)
     }
   },
   resetPasswordToken: {
