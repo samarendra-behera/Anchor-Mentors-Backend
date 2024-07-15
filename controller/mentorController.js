@@ -25,7 +25,7 @@ const myProfile = catchAsync(async (req, res, next) => {
         attributes: { exclude: ['deletedAt'] }
     });
 
-    profileData = currMentor.toJSON()
+    let profileData = currMentor.toJSON()
     const mUser = profileData.user
     delete profileData.user
     profileData = { ...profileData, ...mUser }
@@ -85,8 +85,6 @@ const myProfile = catchAsync(async (req, res, next) => {
     for(let availability of availabilities) {
         availabilitiesData.push()
     }
-
-
 
     return res.status(200).json({
         status: 'success',

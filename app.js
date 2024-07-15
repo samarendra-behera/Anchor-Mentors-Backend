@@ -8,6 +8,7 @@ const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controller/errorController');
 const authRouter = require('./route/authRoute');
 const mentorRouter = require('./route/mentorRoute');
+const menteeRouter = require('./route/menteeRoute');
 
 const app = express()
 
@@ -28,6 +29,7 @@ app.get('/', (req, res)=> {
 // all routes will be here
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/mentor', mentorRouter)
+app.use('/api/v1/mentee', menteeRouter)
 
 
 app.use('*', catchAsync(async(req, res, next )=> {

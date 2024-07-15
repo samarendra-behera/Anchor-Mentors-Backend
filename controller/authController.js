@@ -5,6 +5,7 @@ const { parsePhoneNumberFromString } = require('libphonenumber-js');
 
 const user = require("../db/models/user");
 const mentor = require("../db/models/mentor");
+const mentee = require("../db/models/mentee");
 const twilioClient = require("../config/twilioClient");
 const emailQueue = require("../thirdparty-services/emailQueue");
 const catchAsync = require("../utils/catchAsync");
@@ -116,6 +117,12 @@ const signup = catchAsync(async (req, res, next) => {
 
     if (newUser.userType === 'mentor') {
         await mentor.create({
+            userId: newUser.id
+        })
+    }
+
+    if (newUser.userType === 'mentee') {
+        await mentee.create({
             userId: newUser.id
         })
     }
