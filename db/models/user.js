@@ -56,6 +56,7 @@ const user = sequelize.define('user', {
   phoneNumber: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: true,
     validate: {
       notNull: {
         msg: 'Phone number is required'
