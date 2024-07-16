@@ -150,7 +150,6 @@ const uploadPitchDeck = catchAsync(async (req, res, next) => {
     }
 
     const currMentor = await mentor.findByPk(req.user.id);
-    console.log("Mentor ", currMentor)
     if (currMentor.pitchDeckPath) {
         await fs.rm(currMentor.pitchDeckPath, { force: true })
     }

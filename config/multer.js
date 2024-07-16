@@ -16,7 +16,7 @@ const getSetStorageDir = (dir)=>{
 
 
 // Configure Multer storage
-const mentorPicStorage = multer.diskStorage({
+const picStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, getSetStorageDir('profile-pics'));
     },
@@ -27,7 +27,7 @@ const mentorPicStorage = multer.diskStorage({
     },
 });
 
-const mentorPitchDeckStorage = multer.diskStorage({
+const pitchDeckStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, getSetStorageDir('pitch-decks'));
     },
@@ -40,8 +40,8 @@ const mentorPitchDeckStorage = multer.diskStorage({
 
 
 // Configure Multer middleware
-const mentorPicUpload = multer({
-    storage: mentorPicStorage,
+const picUpload = multer({
+    storage: picStorage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
     fileFilter: (req, file, cb) => {
         if (file.mimetype.startsWith('image/')) {
@@ -52,9 +52,9 @@ const mentorPicUpload = multer({
     },
 });
 
-const mentorPitchDeckUpload = multer({
-    storage: mentorPitchDeckStorage,
+const pitchDeckUpload = multer({
+    storage: pitchDeckStorage,
     limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit
 });
 
-module.exports = {mentorPicUpload, mentorPitchDeckUpload};
+module.exports = {picUpload, pitchDeckUpload};

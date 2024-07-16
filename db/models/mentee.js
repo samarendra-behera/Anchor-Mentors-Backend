@@ -97,6 +97,9 @@ const mentee = sequelize.define('mentee', {
       }
     }
   },
+  pitchDeckPath: {
+    type: DataTypes.STRING
+  },
   createdAt: {
     allowNull: false,
     type: DataTypes.DATE
