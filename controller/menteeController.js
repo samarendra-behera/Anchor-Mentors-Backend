@@ -5,6 +5,7 @@ const user = require("../db/models/user");
 const mentee = require("../db/models/mentee");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require('../utils/appError');
+const mentor = require('../db/models/mentor');
 
 const myProfile = catchAsync(async (req, res, next) => {
     const { id } = req.user
@@ -101,9 +102,40 @@ const uploadPitchDeck = catchAsync(async (req, res, next) => {
     })
 });
 
+const getMentors = catchAsync(async (req, res, next) => {
+    const { role, name } = req.query
+    console.log(role, name)
+    const mentors = await mentor.findAll({
+        include: [
+            {
+                model: user,
+                attributes: { exclude: ['password', 'deletedAt', 'resetPasswordToken', 'resetPasswordExpires', 'id', 'userType', 'createdAt', 'updatedAt'] },
+            }
+        ],
+        attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt', 'pitchDeckPath', ] }
+    });
+
+    let allMentors = []
+
+    for (let mentor of mentors) {
+        mData = mentor.toJSON();
+        let mUser = mData.user;
+        delete mData.user;
+        mData = { ...mData, ...mUser };
+        delete mUser;
+        allMentors.push(mData)
+    }
+    return res.status(200).json({
+        status: 'success',
+        mentors: allMentors
+    });
+
+});
+
 module.exports = {
     myProfile,
     updateProfile,
     uploadProfilePic,
-    uploadPitchDeck
+    uploadPitchDeck,
+    getMentors
 }
