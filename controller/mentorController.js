@@ -133,7 +133,7 @@ const uploadProfilePic = catchAsync(async (req, res, next) => {
         await fs.rm(req.user.profilePicPath, { force: true })
     }
 
-    req.user.profilePicPath = photo.path
+    req.user.profilePicPath = `/uploads/${process.env.PIC_DIR}/${photo.filename}`
     await req.user.save();
 
     return res.status(200).json({
@@ -154,7 +154,7 @@ const uploadPitchDeck = catchAsync(async (req, res, next) => {
         await fs.rm(currMentor.pitchDeckPath, { force: true })
     }
 
-    currMentor.pitchDeckPath = doc.path
+    currMentor.pitchDeckPath = `/uploads/${process.env.PITCH_DIR}/${doc.filename}`
     await currMentor.save();
 
     return res.status(200).json({

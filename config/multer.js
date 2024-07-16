@@ -18,7 +18,7 @@ const getSetStorageDir = (dir)=>{
 // Configure Multer storage
 const picStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, getSetStorageDir('profile-pics'));
+        cb(null, getSetStorageDir(process.env.PIC_DIR));
     },
     filename: (req, file, cb) => {
         const userId = req.user.id; 
@@ -29,7 +29,7 @@ const picStorage = multer.diskStorage({
 
 const pitchDeckStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, getSetStorageDir('pitch-decks'));
+        cb(null, getSetStorageDir(process.env.PITCH_DIR));
     },
     filename: (req, file, cb) => {
         const userId = req.user.id; 
