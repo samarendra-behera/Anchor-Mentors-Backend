@@ -1,10 +1,11 @@
 const _ = require('lodash');
 const fs = require('fs').promises;
-const {Op} = require('sequelize')
+const { Op } = require('sequelize')
 
 const sequelize = require('../config/database');
 const mentor = require("../db/models/mentor");
 const mentorExperience = require("../db/models/mentor_experience");
+const mentorQuestion = require("../db/models/mentor_question");
 const mentorAvailability = require("../db/models/mentor_availability");
 const user = require("../db/models/user");
 const catchAsync = require("../utils/catchAsync");
@@ -56,9 +57,9 @@ const myProfile = catchAsync(async (req, res, next) => {
             mentorId: id,
             experienceType: 'Education'
         },
-        attributes: [ 
-            'startDate', 
-            'endDate', 
+        attributes: [
+            'startDate',
+            'endDate',
             'details',
             [sequelize.col('placeName'), 'schoolName'],
         ]
@@ -82,7 +83,7 @@ const myProfile = catchAsync(async (req, res, next) => {
         attributes: ['dayName', 'startTime', 'endTime'],
     })
     let availabilitiesData = []
-    for(let availability of availabilities) {
+    for (let availability of availabilities) {
         availabilitiesData.push()
     }
 
@@ -278,6 +279,114 @@ const uploadEducationExperience = catchAsync(async (req, res, next) => {
     }
 });
 
+const addNewQuestion = catchAsync(async (req, res, next) => {
+    const { id: mentorId } = req.user
+    const { question } = req.body
+
+    if (!question) {
+        return next(new AppError('Please provide your question', 400));
+    }
+
+    await mentorQuestion.create({
+        question,
+        mentorId
+    })
+
+    return res.status(200).json({
+        status: 'success',
+        message: 'Question added successfully'
+    })
+});
+
+const allQuestions = catchAsync(async (req, res, next) => {
+    const { id: mentorId } = req.user
+    const questions = await mentorQuestion.findAll({
+        where: {
+            mentorId
+        },
+        attributes: { exclude: ['mentorId'] }
+    })
+    return res.status(200).json({
+        status: 'success',
+        questions
+    })
+});
+
+const getQuestion = catchAsync(async (req, res, next) => {
+    const { id: mentorId } = req.user
+    const { questionId } = req.params
+    const question = await mentorQuestion.findOne({
+        where: {
+            mentorId,
+            id: questionId
+        }
+    })
+
+    if (!question) {
+        return next(new AppError('Question not found', 404));
+    }
+    
+    return res.status(200).json({
+        status: 'success',
+        question
+    })
+});
+
+const editQuestion = catchAsync(async (req, res, next) => {
+    const { id: mentorId } = req.user
+    const { question } = req.body
+    const { questionId } = req.params
+
+    if (!question) {
+        return next(new AppError('Please provide your question', 400));
+    }
+
+    let oldQuestion = await mentorQuestion.findOne(
+        {
+            where: {
+                mentorId,
+                id: questionId
+            }
+        }
+    )
+
+    if (!oldQuestion) {
+        return next(new AppError('Question not found', 404));
+    }
+    
+    oldQuestion.question = question
+    await oldQuestion.save()
+
+    return res.status(200).json({
+        status: 'success',
+        message: 'Question updated successfully'
+    })
+});
+
+const removeQuestion = catchAsync(async (req, res, next) => {
+    const { id: mentorId } = req.user
+    const { questionId } = req.params
+    
+    let question = await mentorQuestion.findOne(
+        {
+            where: {
+                mentorId,
+                id: questionId
+            }
+        }
+    )
+    if (!question) {
+        return next(new AppError('Question not found', 404));
+    }
+
+    await question.destroy()
+
+    return res.status(200).json({
+        status: 'success',
+        message: 'Question removed successfully'
+    })
+});
+
 const uploadAvailability = catchAsync(async (req, res, next) => {
     const { id: mentorId } = req.user
     const availabilities = req.body
@@ -289,7 +398,7 @@ const uploadAvailability = catchAsync(async (req, res, next) => {
     let entryDayNames = []
     const t = await sequelize.transaction();
     try {
-        for(let day of availabilities) {
+        for (let day of availabilities) {
             let { startTime, endTime, dayName } = day
 
             if (!startTime || !endTime || !dayName) {
@@ -334,5 +443,10 @@ module.exports = {
     uploadProfilePic,
     uploadWorkExperience,
     uploadEducationExperience,
+    addNewQuestion,
+    allQuestions,
+    getQuestion,
+    editQuestion,
+    removeQuestion, 
     uploadAvailability
 }

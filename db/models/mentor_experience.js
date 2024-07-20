@@ -71,6 +71,7 @@ const mentorExperience = sequelize.define('mentor_experience', {
   },
   mentorId: {
     type: DataTypes.INTEGER,
+    allowNull: false,
     references: {
       model: 'mentor',
       key: 'userId'
