@@ -80,7 +80,7 @@ const verifyVerificationCode = catchAsync(async (req, res, next) => {
     const verificationCheck = await twilioClient.verify.v2.services(process.env.TWILIO_VERIFY_SERVICE_SID)
         .verificationChecks
         .create({ to: formattedPhoneNumber, code: code });
-    
+
     if (verificationCheck.status !== 'approved') {
         return next(new AppError('Invalid verification code', 400))
     }
@@ -156,13 +156,21 @@ const signup = catchAsync(async (req, res, next) => {
 
 
 const login = catchAsync(async (req, res, next) => {
-    const { email, password } = req.body;
+    const { email, password, userType } = req.body;
 
     if (!email || !password) {
         return next(new AppError('Please provide email and password', 400))
     }
 
-    const result = await user.findOne({ where: { email } })
+    if (!userType) {
+        return next(new AppError('Please provide user type', 400))
+    }
+
+    if (!['mentor', 'mentee'].includes(userType)) {
+        return next(new AppError('Invalid user type', 400))
+    }
+
+    const result = await user.findOne({ where: { email, userType } })
 
     if (!result || !(await bcrypt.compare(password, result.password))) {
         return next(new AppError('Incorrect email or password', 400))

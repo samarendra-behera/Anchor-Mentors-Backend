@@ -1,5 +1,6 @@
 const path = require('path');
 const express = require('express');
+const cors = require('cors');
 require('dotenv').config({ path: path.join(process.cwd(), '.env') });
 
 const catchAsync = require('./utils/catchAsync');
@@ -12,13 +13,20 @@ const menteeRouter = require('./route/menteeRoute');
 
 const app = express()
 
+// Configure CORS
+app.use(cors({
+    origin: '*', // Allows all origins
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+}));
+
 app.use(express.json())
 
 // Serve the uploaded files statically
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 
-app.get('/', (req, res)=> {
+app.get('/', (req, res) => {
     res.status(200).json({
         status: 'success',
         message: 'Wahoo! REST APIs are working',
@@ -32,12 +40,12 @@ app.use('/api/v1/mentor', mentorRouter)
 app.use('/api/v1/mentee', menteeRouter)
 
 
-app.use('*', catchAsync(async(req, res, next )=> {
+app.use('*', catchAsync(async (req, res, next) => {
     throw new AppError(`Can't find ${req.originalUrl} on this server`, 404);
 }));
 
 app.use(globalErrorHandler);
 
-app.listen(process.env.APP_PORT, ()=> {
+app.listen(process.env.APP_PORT, () => {
     console.log('Server up and running on port', process.env.APP_PORT);
 });
