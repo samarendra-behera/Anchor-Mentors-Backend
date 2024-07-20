@@ -33,7 +33,7 @@ const sendVerificationCode = catchAsync(async (req, res, next) => {
     const formattedPhoneNumber = phoneNumberInstance.formatInternational();
 
     // Send verification code
-    await twilioClient.verify.services(process.env.TWILIO_VERIFY_SERVICE_SID).verifications.create({
+    await twilioClient.verify.v2.services(process.env.TWILIO_VERIFY_SERVICE_SID).verifications.create({
         to: formattedPhoneNumber,
         channel: 'sms'
     })
