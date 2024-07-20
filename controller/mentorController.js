@@ -341,7 +341,7 @@ const editQuestion = catchAsync(async (req, res, next) => {
         return next(new AppError('Please provide your question', 400));
     }
 
-    let oldQuestion = await mentorQuestion.findOne(
+    let mQuestion = await mentorQuestion.findOne(
         {
             where: {
                 mentorId,
@@ -350,12 +350,12 @@ const editQuestion = catchAsync(async (req, res, next) => {
         }
     )
 
-    if (!oldQuestion) {
+    if (!mQuestion) {
         return next(new AppError('Question not found', 404));
     }
     
-    oldQuestion.question = question
-    await oldQuestion.save()
+    mQuestion.question = question
+    await mQuestion.save()
 
     return res.status(200).json({
         status: 'success',
@@ -367,7 +367,7 @@ const removeQuestion = catchAsync(async (req, res, next) => {
     const { id: mentorId } = req.user
     const { questionId } = req.params
     
-    let question = await mentorQuestion.findOne(
+    let mQuestion = await mentorQuestion.findOne(
         {
             where: {
                 mentorId,
@@ -375,11 +375,11 @@ const removeQuestion = catchAsync(async (req, res, next) => {
             }
         }
     )
-    if (!question) {
+    if (!mQuestion) {
         return next(new AppError('Question not found', 404));
     }
 
-    await question.destroy()
+    await mQuestion.destroy()
 
     return res.status(200).json({
         status: 'success',
