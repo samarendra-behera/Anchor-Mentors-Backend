@@ -20,6 +20,14 @@ module.exports = {
       role: {
         type: Sequelize.STRING
       },
+      startWorking: {
+        type: Sequelize.DATE,
+      },
+      isProfileComplete: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+      },
       location: {
         type: Sequelize.STRING
       },
@@ -50,8 +58,9 @@ module.exports = {
       menteePersonaForBooking: {
         type: Sequelize.STRING({ length: 1000 })
       },
-      pitchDeckPath: {
-        type: Sequelize.STRING
+      needPitchDeck: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       createdAt: {
         allowNull: false,

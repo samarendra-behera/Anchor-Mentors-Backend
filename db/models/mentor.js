@@ -21,6 +21,24 @@ const mentor = sequelize.define('mentor', {
   role: {
     type: DataTypes.STRING
   },
+  startWorking: {
+    type: DataTypes.DATE,
+    validate:{
+      isDate: {
+        msg: 'Start date must be a valid date'
+      }
+    }
+  },
+  isProfileComplete: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    allowNull: false,
+    validate: {
+      isBoolean: {
+        msg: 'isProfileComplete must be true or false'
+      }
+    }
+  },
   location: {
     type: DataTypes.STRING
   },
@@ -114,8 +132,14 @@ const mentor = sequelize.define('mentor', {
       return value.split(',');
     }
   },
-  pitchDeckPath: {
-    type: DataTypes.STRING
+  needPitchDeck: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    validate: {
+      isBoolean: {
+        msg: 'needPitchDeck must be true or false'
+      }
+    }
   },
   createdAt: {
     allowNull: false,

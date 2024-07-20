@@ -100,6 +100,7 @@ const updateProfile = catchAsync(async (req, res, next) => {
     const updatableFields = [
         'bio',
         'role',
+        'startWorking',
         'location',
         'languages',
         'inspires',
@@ -109,6 +110,8 @@ const updateProfile = catchAsync(async (req, res, next) => {
         'pastMentoringExperienceDescription',
         'domainExpertise',
         'menteePersonaForBooking',
+        'isProfileComplete',
+        'needPitchDeck',
     ];
     // Pick only the fields present in the request body
     const updateFields = _.pick(req.body, updatableFields);
@@ -143,25 +146,25 @@ const uploadProfilePic = catchAsync(async (req, res, next) => {
 });
 
 
-const uploadPitchDeck = catchAsync(async (req, res, next) => {
-    const doc = req.file
-    if (!doc) {
-        return next(new AppError('Please provide pitch deck', 400));
-    }
+// const uploadPitchDeck = catchAsync(async (req, res, next) => {
+//     const doc = req.file
+//     if (!doc) {
+//         return next(new AppError('Please provide pitch deck', 400));
+//     }
 
-    const currMentor = await mentor.findByPk(req.user.id);
-    if (currMentor.pitchDeckPath) {
-        await fs.rm(currMentor.pitchDeckPath, { force: true })
-    }
+//     const currMentor = await mentor.findByPk(req.user.id);
+//     if (currMentor.pitchDeckPath) {
+//         await fs.rm(currMentor.pitchDeckPath, { force: true })
+//     }
 
-    currMentor.pitchDeckPath = `/uploads/${process.env.PITCH_DIR}/${doc.filename}`
-    await currMentor.save();
+//     currMentor.pitchDeckPath = `/uploads/${process.env.PITCH_DIR}/${doc.filename}`
+//     await currMentor.save();
 
-    return res.status(200).json({
-        status: 'success',
-        message: 'Pitch deck uploaded successfully'
-    })
-});
+//     return res.status(200).json({
+//         status: 'success',
+//         message: 'Pitch deck uploaded successfully'
+//     })
+// });
 
 
 const uploadWorkExperience = catchAsync(async (req, res, next) => {
@@ -329,7 +332,6 @@ module.exports = {
     myProfile,
     updateProfile,
     uploadProfilePic,
-    uploadPitchDeck,
     uploadWorkExperience,
     uploadEducationExperience,
     uploadAvailability
