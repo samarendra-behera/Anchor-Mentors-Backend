@@ -21,7 +21,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       startWorking: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
       isProfileComplete: {
         type: Sequelize.BOOLEAN,
@@ -32,10 +32,10 @@ module.exports = {
         type: Sequelize.STRING
       },
       languages: {
-        type: Sequelize.STRING
+        type: Sequelize.JSON
       },
       inspires: {
-        type: Sequelize.STRING({ length: 1000 })
+        type: Sequelize.JSON
       },
       experience: {
         type: Sequelize.FLOAT
@@ -56,11 +56,23 @@ module.exports = {
         type: Sequelize.STRING
       },
       menteePersonaForBooking: {
-        type: Sequelize.STRING({ length: 1000 })
+        type: Sequelize.JSON
       },
       needPitchDeck: {
         type: Sequelize.BOOLEAN,
         defaultValue: false
+      },
+      sessionFrequency: {
+        type: Sequelize.STRING
+      },
+      goals: {
+        type: Sequelize.JSON
+      },
+      motivation: {
+        type: Sequelize.STRING({length: 1000})
+      },
+      membershipBenefits: {
+        type: Sequelize.STRING({length: 1000})
       },
       createdAt: {
         allowNull: false,

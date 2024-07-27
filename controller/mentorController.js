@@ -96,6 +96,12 @@ const myProfile = catchAsync(async (req, res, next) => {
 
 const updateProfile = catchAsync(async (req, res, next) => {
     const { id } = req.user
+    let body = req.body
+    if ( Object.keys(body).length === 0 && body.constructor === Object){
+        return next(new AppError('Please provide at least one field to update', 400));
+    }
+
+    
 
     // Define the updatable fields
     const updatableFields = [
@@ -113,6 +119,10 @@ const updateProfile = catchAsync(async (req, res, next) => {
         'menteePersonaForBooking',
         'isProfileComplete',
         'needPitchDeck',
+        'goals',
+        'sessionFrequency',
+        'motivation',
+        'membershipBenefits'
     ];
     // Pick only the fields present in the request body
     const updateFields = _.pick(req.body, updatableFields);
@@ -120,6 +130,11 @@ const updateProfile = catchAsync(async (req, res, next) => {
     await mentor.update(updateFields, {
         where: { userId: id }
     });
+    
+    const {fullName} = body
+    if(fullName){
+        await user.update({fullName}, {where: {id}})
+    }
 
     return res.status(200).json({
         status: 'success',
